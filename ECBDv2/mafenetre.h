@@ -9,6 +9,8 @@
 #include <QString>
 #include <QLineEdit>
 #include <QTableWidget>
+#include <QTableWidgetItem>
+
 
 #include "charger_csv.h"
 class MaFenetre : public QMainWindow

@@ -7,7 +7,7 @@
 
 MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 {
-    setFixedSize(800,600);
+    setFixedSize(1000,800);
 
     title = new QLabel("Classification des patients - Prediction", this);
     title->setFixedWidth(500);
@@ -16,27 +16,43 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     labelname = new QLabel("Nom : ", this);
     labelname->setFont(QFont("Arial", 12, QFont::Bold, true));
-    labelname->move(550, 30);
+    labelname->move(750, 30);
 
     nom = new QLineEdit(this);
-    nom->move(650, 30);
+    nom->move(labelname->x()+75, 30);
 
     labelprename = new QLabel("Prenom : ", this);
     labelprename->setFont(QFont("Arial", 12, QFont::Bold, true));
-    labelprename->move(550, 65);
+    labelprename->move(750, 65);
 
     prenom = new QLineEdit(this);
-    prenom->move(650, 65);
+    prenom->move(labelprename->x()+75, 65);
 
     maladielabel = new QLabel("Maladie : ", this);
     maladielabel->setFont(QFont("Arial", 12, QFont::Bold, true));
-    maladielabel->move(50, 400); // x,y
+    maladielabel->move(50, 700); // x,y
 
     m_bou = new QPushButton("Quitter", this); // int x, int y, int w, int h
-    m_bou->setGeometry(710,550,80,40);
+    m_bou->setGeometry(850,700,80,40);
 
     predire = new QPushButton("Predire", this);
-    predire->setGeometry(500,400,80,40);
+    predire->setGeometry(m_bou->x()-100,m_bou->y(),80,40);
+
+    m_tablewidget = new QTableWidget(this);
+    m_tablewidget->move(150,300);
+    m_tablewidget->setMinimumSize(700,300);
+
+    m_tablewidget->setRowCount(m_mat.size());
+    m_tablewidget->setColumnCount(m_vet.size());
+
+    for(unsigned i(0);i<m_mat.size();++i)
+        for(unsigned j(0);j<m_vet.size();++j)
+            m_tablewidget->setItem(i,j,new QTableWidgetItem(m_mat[i][j].c_str()));
+
+    for(unsigned i(0);i<m_vet.size();++i)
+        m_tablewidget->setHorizontalHeaderItem(i,new QTableWidgetItem(m_vet[i].c_str()));
+
+
 
 
 
@@ -44,7 +60,7 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     connect(m_bou, SIGNAL(clicked()), this, SLOT(setQuitter()));
 
-    //connect(m_bou, SIGNAL(clicked()), this, SLOT( predict() ));
+    connect(m_bou, SIGNAL(clicked()), this, SLOT( predict() ));
 
 
 
@@ -122,15 +138,17 @@ void MaFenetre::setItems(int i, QComboBox *combo) {
 
 
 
-}
+    }
 
 }
 
-void MaFenetre::fillTableWidget(QTableWidget *table) {
-    /* a remplir */
+//void MaFenetre::fillTableWidget(QTableWidget *table) {
+//    /* a remplir */
 
 
 
-}
+
+
+//}
 
 
