@@ -8,6 +8,8 @@
 MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 {
     setFixedSize(1000,800);
+    read_csv (m_mat, m_vet, "data.csv");
+
 
     title = new QLabel("Classification des patients - Prediction", this);
     title->setFixedWidth(500);
@@ -32,25 +34,33 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
     maladielabel->setFont(QFont("Arial", 12, QFont::Bold, true));
     maladielabel->move(50, 700); // x,y
 
+    maladieresult = new QLabel("Aucune", this);
+    maladieresult->setFont(QFont("Arial", 12, QFont::Bold, true));
+//    maladieresult->move(); // x,y
+    maladieresult->setGeometry(maladieresult->x()+125, 700,100,100);
+
     m_bou = new QPushButton("Quitter", this); // int x, int y, int w, int h
     m_bou->setGeometry(850,700,80,40);
 
     predire = new QPushButton("Predire", this);
     predire->setGeometry(m_bou->x()-100,m_bou->y(),80,40);
 
+
     m_tablewidget = new QTableWidget(this);
     m_tablewidget->move(150,300);
-    m_tablewidget->setMinimumSize(700,300);
+    m_tablewidget->setMinimumSize(500,300);
 
     m_tablewidget->setRowCount(m_mat.size());
     m_tablewidget->setColumnCount(m_vet.size());
 
-    for(unsigned i(0);i<m_mat.size();++i)
-        for(unsigned j(0);j<m_vet.size();++j)
-            m_tablewidget->setItem(i,j,new QTableWidgetItem(m_mat[i][j].c_str()));
+    for(unsigned i(0); i<m_mat.size() ;++i) {
+        for(unsigned j(0); j<m_vet.size(); ++j) {
+                m_tablewidget->setItem(i,j,new QTableWidgetItem(QString::fromUtf8(m_mat[i][j].c_str())));
+            }
+        }
 
-    for(unsigned i(0);i<m_vet.size();++i)
-        m_tablewidget->setHorizontalHeaderItem(i,new QTableWidgetItem(m_vet[i].c_str()));
+        for(unsigned i(0);i<m_vet.size();++i)
+        m_tablewidget->setHorizontalHeaderItem(i,new QTableWidgetItem(QString::fromUtf8(m_vet[i].c_str())));
 
 
 
@@ -60,11 +70,10 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     connect(m_bou, SIGNAL(clicked()), this, SLOT(setQuitter()));
 
-    connect(m_bou, SIGNAL(clicked()), this, SLOT( predict() ));
+    connect(predire, SIGNAL(clicked()), this, SLOT( predict() ));
 
 
 
-    read_csv (m_mat, m_vet, "data.csv");
 
     m_lab1 = new QLabel(getHeader(0),this);
     m_lab1->setFont(QFont("Arial", 12, QFont::Bold, true));
@@ -98,13 +107,13 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
     setItems(2,m_com3);
 
 
-
+    string str = "Rhume";
+    float score = 0;
+    score = calcFreq(str,3);
+    cout << score << endl;
 
 }
 
-void predict() {
-    //fonction de prediction qui trouve la maladie et l'affiche a coté du label maladie
-}
 
 void MaFenetre::setQuitter()
 {
@@ -142,13 +151,42 @@ void MaFenetre::setItems(int i, QComboBox *combo) {
 
 }
 
-//void MaFenetre::fillTableWidget(QTableWidget *table) {
-//    /* a remplir */
+
+float MaFenetre::calcFreq(string maladie, int col){
+    float freq = 0;
+    for (int i = 0 ; i < m_mat.size() ; ++i){
+        if (m_mat[i][col] == maladie){
+            ++freq;
+        }
+    }
+    return freq/m_mat.size();
+}
+
+
+int MaFenetre::calcConf(string maladie) {
 
 
 
 
 
-//}
+
+
+
+}
+
+void MaFenetre::predict() {
+//    string ss = "2/9";
+//    maladieresult->setText(QString(ss.c_str()));
+    string fievre = m_com1->currentText();
+    string douleur = m_com2->currentText();
+    string toux = m_com3->currentText();
+
+    for (int i = 0 ; m_mat.size() ; ++i){
+
+    }
+
+
+}
+
 
 
