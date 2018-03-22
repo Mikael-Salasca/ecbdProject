@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QMessageBox>
 
 
 #include "charger_csv.h"
@@ -19,6 +20,7 @@ class MaFenetre : public QMainWindow
 public slots :
     void setQuitter();
     void predict();
+
 
 public :
     MaFenetre(QWidget *parent = 0);
@@ -36,8 +38,11 @@ private :
     CMatString m_mat;
     QString getHeader(int row);
     void setItems(int row, QComboBox *combo); 
-    float calcFreq(string maladie, int col);
-    int calcConf(string maladie);
+    float calcFreq(string maladie);
+    float calcFreq(string maladie, string sympt, int col);
+    vector<string> getMaladies();
+
+    float calcConf(string maladie, string sympt, int col);
 
 
 

@@ -36,7 +36,7 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     maladieresult = new QLabel("Aucune", this);
     maladieresult->setFont(QFont("Arial", 12, QFont::Bold, true));
-//    maladieresult->move(); // x,y
+    //    maladieresult->move(); // x,y
     maladieresult->setGeometry(maladieresult->x()+125, 700,100,100);
 
     m_bou = new QPushButton("Quitter", this); // int x, int y, int w, int h
@@ -55,11 +55,11 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     for(unsigned i(0); i<m_mat.size() ;++i) {
         for(unsigned j(0); j<m_vet.size(); ++j) {
-                m_tablewidget->setItem(i,j,new QTableWidgetItem(QString::fromUtf8(m_mat[i][j].c_str())));
-            }
+            m_tablewidget->setItem(i,j,new QTableWidgetItem(QString::fromUtf8(m_mat[i][j].c_str())));
         }
+    }
 
-        for(unsigned i(0);i<m_vet.size();++i)
+    for(unsigned i(0);i<m_vet.size();++i)
         m_tablewidget->setHorizontalHeaderItem(i,new QTableWidgetItem(QString::fromUtf8(m_vet[i].c_str())));
 
 
@@ -106,12 +106,6 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
     m_com3->setCurrentIndex(0);
     setItems(2,m_com3);
 
-
-    string str = "Rhume";
-    float score = 0;
-    score = calcFreq(str,3);
-    cout << score << endl;
-
 }
 
 
@@ -151,11 +145,22 @@ void MaFenetre::setItems(int i, QComboBox *combo) {
 
 }
 
-
-float MaFenetre::calcFreq(string maladie, int col){
+// calculer la freq pr une colonne
+float MaFenetre::calcFreq(string maladie){
     float freq = 0;
     for (int i = 0 ; i < m_mat.size() ; ++i){
-        if (m_mat[i][col] == maladie){
+        if (m_mat[i][3] == maladie){
+            ++freq;
+        }
+    }
+    return freq/m_mat.size();
+}
+
+// calculer la freq pour la conf
+float MaFenetre::calcFreq(string maladie, string sympt, int col){
+    float freq = 0;
+    for (int i = 0 ; i < m_mat.size() ; ++i){
+        if (m_mat[i][col] == sympt && m_mat[i][3] ==maladie ){
             ++freq;
         }
     }
@@ -163,30 +168,97 @@ float MaFenetre::calcFreq(string maladie, int col){
 }
 
 
-int MaFenetre::calcConf(string maladie) {
+float MaFenetre::calcConf(string maladie, string sympt, int col) {
 
-
-
-
-
-
-
+    return calcFreq(maladie,sympt,col) / calcFreq(maladie);
 
 }
 
-void MaFenetre::predict() {
-//    string ss = "2/9";
-//    maladieresult->setText(QString(ss.c_str()));
-    string fievre = m_com1->currentText();
-    string douleur = m_com2->currentText();
-    string toux = m_com3->currentText();
+vector<string> MaFenetre::getMaladies(){
+    vector<string> maladies;
+    for(unsigned i(1); i < m_mat.size() ; ++i)
+        maladies.push_back(m_mat[i][3]);
 
-    for (int i = 0 ; m_mat.size() ; ++i){
+    sort(maladies.begin(), maladies.end());
+    maladies.erase(unique(maladies.begin(), maladies.end()), maladies.end());
+
+    return maladies;
+}
+
+void MaFenetre::predict() {
+    //    string ss = "2/9";
+    //    maladieresult->setText(QString(ss.c_str()));
+    string fievre = m_com1->currentText().toUtf8().constData();
+    string douleur = m_com2->currentText().toUtf8().constData();
+    string toux = m_com3->currentText().toUtf8().constData();
+
+    if ( fievre == "NULL" && douleur == "NULL" && toux == "NULL"  ) {
+        //gérer le cas où tout est nul
+        QMessageBox msgBox;
+        msgBox.setText("Renseignez au moins 1 symptome");
+        msgBox.exec();
+    }
+
+    else {
+
+
+        map<string, float> maladiesEtScore; // maladie : score = 1
+
+
+        for(unsigned i(0); i < getMaladies().size(); ++i){
+            string maladieParcourue = getMaladies()[i];
+            maladiesEtScore.insert(make_pair(maladieParcourue, 1));
+        }
+
+        if(fievre != "NULL"){
+            map<string, float>::iterator it = maladiesEtScore.begin();
+            while (it != maladiesEtScore.end()){
+                it->second *= calcConf(it->first, fievre, 0);
+                it++;
+            }
+        }
+
+
+
+        if(douleur != "NULL"){
+
+            map<string, float>::iterator it = maladiesEtScore.begin();
+            while (it != maladiesEtScore.end()){
+                it->second *= calcConf(it->first, douleur, 1);
+                it++;
+            }
+        }
+
+        if(toux != "NULL"){
+            map<string, float>::iterator it = maladiesEtScore.begin();
+            while (it != maladiesEtScore.end()){
+                it->second *= calcConf(it->first, toux, 2);
+                it++;
+            }
+        }
+
+
+
+        map<string, float>::iterator it = maladiesEtScore.begin();
+        float scoremax = 0;
+        string maladiepredie="";
+
+        while (it != maladiesEtScore.end()){
+            it -> second*=calcFreq(it->first) ;
+            if (it -> second > scoremax){
+                scoremax = it->second;
+                maladiepredie = it ->first;
+            }
+
+
+            maladieresult->setText(QString::fromUtf8(maladiepredie.c_str()));
+
+
+
+        }
 
     }
 
 
+
 }
-
-
-
