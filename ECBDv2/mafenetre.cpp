@@ -36,8 +36,7 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     maladieresult = new QLabel("Aucune", this);
     maladieresult->setFont(QFont("Arial", 12, QFont::Bold, true));
-    //    maladieresult->move(); // x,y
-    maladieresult->setGeometry(maladieresult->x()+125, 700,100,100);
+    maladieresult->move(x()+125, 700); // x,y
 
     m_bou = new QPushButton("Quitter", this); // int x, int y, int w, int h
     m_bou->setGeometry(850,700,80,40);
@@ -48,7 +47,7 @@ MaFenetre::MaFenetre(QWidget *parent) : QMainWindow(parent)
 
     m_tablewidget = new QTableWidget(this);
     m_tablewidget->move(150,300);
-    m_tablewidget->setMinimumSize(500,300);
+    m_tablewidget->setMinimumSize(425,300);
 
     m_tablewidget->setRowCount(m_mat.size());
     m_tablewidget->setColumnCount(m_vet.size());
@@ -148,7 +147,7 @@ void MaFenetre::setItems(int i, QComboBox *combo) {
 // calculer la freq pr une colonne
 float MaFenetre::calcFreq(string maladie){
     float freq = 0;
-    for (int i = 0 ; i < m_mat.size() ; ++i){
+    for (unsigned i = 0 ; i < m_mat.size() ; ++i){
         if (m_mat[i][3] == maladie){
             ++freq;
         }
@@ -159,7 +158,7 @@ float MaFenetre::calcFreq(string maladie){
 // calculer la freq pour la conf
 float MaFenetre::calcFreq(string maladie, string sympt, int col){
     float freq = 0;
-    for (int i = 0 ; i < m_mat.size() ; ++i){
+    for (unsigned i = 0 ; i < m_mat.size() ; ++i){
         if (m_mat[i][col] == sympt && m_mat[i][3] ==maladie ){
             ++freq;
         }
@@ -186,8 +185,7 @@ vector<string> MaFenetre::getMaladies(){
 }
 
 void MaFenetre::predict() {
-    //    string ss = "2/9";
-    //    maladieresult->setText(QString(ss.c_str()));
+
     string fievre = m_com1->currentText().toUtf8().constData();
     string douleur = m_com2->currentText().toUtf8().constData();
     string toux = m_com3->currentText().toUtf8().constData();
@@ -249,13 +247,23 @@ void MaFenetre::predict() {
                 scoremax = it->second;
                 maladiepredie = it ->first;
             }
+            it++;
 
 
-            maladieresult->setText(QString::fromUtf8(maladiepredie.c_str()));
 
 
 
         }
+
+        if(scoremax==0) {
+            maladiepredie = "?";
+            maladieresult->setText(QString::fromUtf8(maladiepredie.c_str()));
+            QMessageBox msgBox;
+            msgBox.setText("Impossible de predire la maladie");
+            msgBox.exec();
+        }
+        else
+            maladieresult->setText(QString::fromUtf8(maladiepredie.c_str()));
 
     }
 
