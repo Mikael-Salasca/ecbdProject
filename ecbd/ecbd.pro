@@ -6,3 +6,5 @@ SOURCES += \
 HEADERS += \
     mafenetre.h \
     charger_csv.h
+
+QT += widgets
